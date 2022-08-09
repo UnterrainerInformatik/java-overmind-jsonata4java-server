@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<parent>
+		<groupId>info.unterrainer.commons</groupId>
+		<artifactId>parent-pom</artifactId>
+		<version>0.2.1</version>
+	</parent>
+
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>overmind-jsonata4java-server</artifactId>
+	<version>0.2.0</version>
+	<name>OvermindJsonata4JavaServer</name>
+	<packaging>jar</packaging>
+
+	<properties>
+		<mainclass>info.unterrainer.commons.overmindjsonata4javaserver.Server</mainclass>
+		<name>Overmind-Jsonatat4Java-Server</name>
+		<package-path>info/unterrainer/commons/overmindjsonata4javaserver</package-path>
+		<packg-string>info.unterrainer.commons.overmindjsonata4javaserver</packg-string>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.zeromq</groupId>
+			<artifactId>jeromq</artifactId>
+			<version>0.5.2</version>
+		  </dependency>
+	</dependencies>
+
+</project>
