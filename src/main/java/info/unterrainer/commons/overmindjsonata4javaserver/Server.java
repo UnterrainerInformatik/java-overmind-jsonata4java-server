@@ -57,6 +57,7 @@ public class Server {
 		}
 	}
 
+	// Gets a query and a json-array to query against and returns 'true' or not.
 	private String jsonataQuery(final String query, final String json) throws IOException {
 		if (query == null) {
 			log.error("Config-string of check was null.");
@@ -79,8 +80,7 @@ public class Server {
 		try {
 			Expressions expr = Expressions.parse(query);
 			JsonNode jsonResult = expr.evaluate(jsonObj);
-			final Object obj = mapper.treeToValue(jsonResult, Object.class);
-			result = mapper.writeValueAsString(obj);
+			result = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonResult);
 		} catch (ParseException e) {
 			log.error("Error parsing expression-json.", e);
 			throw new IOException(e);
