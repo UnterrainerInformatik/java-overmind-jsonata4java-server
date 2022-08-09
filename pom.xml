@@ -10,7 +10,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>overmind-jsonata4java-server</artifactId>
-	<version>0.2.0</version>
+	<version>0.0.2</version>
 	<name>OvermindJsonata4JavaServer</name>
 	<packaging>jar</packaging>
 
