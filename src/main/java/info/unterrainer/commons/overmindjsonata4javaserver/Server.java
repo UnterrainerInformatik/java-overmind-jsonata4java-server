@@ -10,6 +10,7 @@ import org.zeromq.ZMsg;
 import com.api.jsonata4java.expressions.EvaluateException;
 import com.api.jsonata4java.expressions.Expressions;
 import com.api.jsonata4java.expressions.ParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -40,25 +41,29 @@ public class Server {
 			while (!Thread.currentThread().isInterrupted()) {
 				// Block until a message is received
 				ZMsg msg = ZMsg.recvMsg(socket);
+				log.info("New message received.");
 				if (msg != null) {
 					String query = msg.popString();
 					String json = msg.popString();
 					msg.destroy();
+					log.info("Received query [{}]", query);
+					log.debug("Received json [{}]", json);
 
 					String result = jsonataQuery(query, json);
 
-					// Send a response
+					log.info("Sending result [{}].", result);
 					ZMsg reply = new ZMsg();
 					reply.add(result);
 					reply.send(socket);
 					reply.destroy();
-				}
+				} else
+					log.warn("Message was null.");
 			}
 		}
 	}
 
 	// Gets a query and a json-array to query against and returns 'true' or not.
-	private String jsonataQuery(final String query, final String json) throws IOException {
+	private String jsonataQuery(final String query, final String json) {
 		if (query == null) {
 			log.error("Config-string of check was null.");
 			return null;
@@ -76,18 +81,25 @@ public class Server {
 			log.error("Error reading state-array-json.", e);
 		}
 
-		String result = null;
+		Expressions expr = null;
 		try {
-			Expressions expr = Expressions.parse(query);
-			JsonNode jsonResult = expr.evaluate(jsonObj);
-			result = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonResult);
-		} catch (ParseException e) {
-			log.error("Error parsing expression-json.", e);
-			throw new IOException(e);
-		} catch (EvaluateException e) {
-			log.error("Error evaluating expression-json.", e);
-			throw new IOException(e);
+			expr = Expressions.parse(query);
+		} catch (ParseException | IOException e) {
+			log.error("Error parsing query-expression.", e);
+			return null;
 		}
-		return result;
+		JsonNode jsonResult = null;
+		try {
+			jsonResult = expr.evaluate(jsonObj);
+		} catch (EvaluateException e) {
+			log.error("Error evaluating query-expression on json.", e);
+			return null;
+		}
+		try {
+			return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonResult);
+		} catch (JsonProcessingException e) {
+			log.error("Error serializing result to string.", e);
+			return null;
+		}
 	}
 }
