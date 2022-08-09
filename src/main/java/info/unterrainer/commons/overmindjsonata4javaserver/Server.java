@@ -3,6 +3,7 @@ package info.unterrainer.commons.overmindjsonata4javaserver;
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
+import org.zeromq.ZMsg;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,15 +20,30 @@ public class Server {
 
 			while (!Thread.currentThread().isInterrupted()) {
 				// Block until a message is received
-				byte[] reply = socket.recv(0);
+				ZMsg msg = ZMsg.recvMsg(socket);
+				if (msg != null) {
+					String value = readAll(msg);
+					msg.destroy();
 
-				// Print the message
-				System.out.println("Received: [" + new String(reply, ZMQ.CHARSET) + "]");
-
-				// Send a response
-				String response = "Hello, world!";
-				socket.send(response.getBytes(ZMQ.CHARSET), 0);
+					System.out.println("Received: [" + value + "]");
+					// Send a response
+					ZMsg reply = new ZMsg();
+					reply.add("Hello. Your message was: \"");
+					reply.add(value);
+					reply.add("\"");
+					reply.send(socket);
+					reply.destroy();
+				}
 			}
 		}
+	}
+
+	public static String readAll(final ZMsg msg) {
+		if (msg == null)
+			return null;
+		StringBuilder sb = new StringBuilder();
+		while (msg.peek() != null)
+			sb.append(msg.popString());
+		return sb.toString();
 	}
 }
