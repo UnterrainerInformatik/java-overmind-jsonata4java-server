@@ -1,4 +1,4 @@
-package info.unterrainer.commons.overmindjsonata4javaserver;
+package info.unterrainer.commons.overmindjsonata4javaserver.manualclients;
 
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
@@ -8,7 +8,7 @@ import org.zeromq.ZMsg;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class Client {
+public class SocketClient {
 
 	public static void main(final String[] args) throws Exception {
 		try (ZContext context = new ZContext()) {
